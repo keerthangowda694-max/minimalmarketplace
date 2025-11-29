@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Product Detail</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* ------------------ BODY & BACKGROUND ------------------ */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    background: linear-gradient(120deg,#a18cd1,#fbc2eb);
+    background-size: 400% 400%;
+    animation: gradientShift 20s ease infinite;
+    overflow-x: hidden;
+    position: relative;
+}
+
+@keyframes gradientShift {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
+}
+
+h1 {
+    text-align: center;
+    color: #fff;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: fadeIn 1s ease forwards;
+}
+
+#image {
+    display: block;
+    max-width: 400px;
+    margin: 20px auto;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    transition: transform 0.4s, box-shadow 0.4s;
+}
+#image:hover {
+    transform: scale(1.05) rotate(1deg);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+}
+
+p {
+    text-align: center;
+    color: #333;
+    font-size: 1.1rem;
+    margin: 10px 0;
+    animation: fadeIn 1s ease forwards;
+}
+
+a.btn {
+    display: inline-block;
+    margin: 20px auto;
+    padding: 12px 25px;
+    background: #ff6b6b;
+    color: #fff;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+a.btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+}
+
+/* ------------------ FLOATING PARTICLES ------------------ */
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.15;
+    animation: floatParticle linear infinite;
+    pointer-events: none;
+    will-change: transform;
+}
+@keyframes floatParticle {
+    0% {transform: translateY(0) rotate(0deg);}
+    50% {transform: translateY(-80px) rotate(180deg);}
+    100% {transform: translateY(0) rotate(360deg);}
+}
+
+@keyframes fadeIn {0%{opacity:0;}100%{opacity:1;}}
+
+/* ------------------ META CONTAINER ------------------ */
+.meta {
+    max-width: 900px;
+    margin: 10px auto;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.info-box {
+    background: rgba(255,255,255,0.95);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    text-align: center;
+}
+
+/* ------------------ PAYMENT POPUP ------------------ */
+#paymentPopup {
+    display: none;
+    position: fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#paymentPopup .popup-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    min-width: 300px;
+    text-align: center;
+    position: relative;
+}
+
+#paymentPopup input {
+    padding: 8px;
+    width: 80%;
+    margin: 15px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+#paymentPopup button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    margin: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+#payBtn { background: #28a745; color: #fff; }
+#cancelBtn { background: #dc3545; color: #fff; }
+
+#paymentPopup img {
+    width: 150px;
+    margin-bottom: 10px;
+    transition: transform 0.3s;
+}
+#paymentPopup img:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+/* ------------------ PAYMENT LOADER ------------------ */
+#paymentLoader {
+    display: none;
+    margin: 15px 0;
+}
+#paymentLoader div {
+    width: 40px;
+    height: 40px;
+    border: 5px solid #ccc;
+    border-top-color: #28a745;
+    border-radius: 50%;
+    margin: 10px auto;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ------------------ RESPONSIVE ------------------ */
+@media (max-width: 768px) {
+    .meta { flex-direction: column; align-items: center; }
+    .info-box { min-width: 90%; }
+}
+</style>
+</head>
+<body>
+
+<h1 id="name">Product Name</h1>
+
+<div class="meta">
+    <div class="info-box" style="min-width:420px;">
+        <img id="image" src="" alt="Product">
+        <p id="price"></p>
+        <a href="javascript:void(0);" class="btn" onclick="openPaymentPopup()">Buy Now</a>
+    </div>
+
+    <div class="info-box" style="min-width:300px;">
+        <p id="description"></p>
+        <div id="user-info" style="margin-top:10px;">
+            <p>Viewing as: <strong id="viewing-as">Guest</strong></p>
+            <p>Points: <span id="points">0</span></p>
+            <p>Badges: <span id="badges">None</span></p>
+        </div>
+        <a href="/" class="btn">Back to Marketplace</a>
+    </div>
+</div>
+
+<!-- Floating particles -->
+<div class="particle" style="width:60px;height:60px;background:rgba(255,255,255,0.2);top:80px;left:60px;animation-duration:12s;"></div>
+<div class="particle" style="width:40px;height:40px;background:rgba(255,255,255,0.15);top:300px;left:250px;animation-duration:18s;"></div>
+<div class="particle" style="width:80px;height:80px;background:rgba(255,255,255,0.1);top:500px;left:120px;animation-duration:22s;"></div>
+
+<!-- Payment Popup -->
+<div id="paymentPopup">
+    <div class="popup-content">
+        <h2>Pay via UPI / Card</h2>
+        <p>No points required! Scan QR or pay directly:</p>
+        <!-- Clickable QR -->
+    
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhX19ddk3qEUsPB9LA83C6zZyytLHbE8SVZ6DZ8PmCsS2toezlj5z9Zl8nAXelA9bjsOCo8HRcPnEDh7i6JxYEHyNCwajGD9nrbXs6CTwTbtbzY1qSOYqDRuRVV8pXFc5CoThWHwse5GlM/s1600/final+output.PNG" alt="UPI QR Code"> Make a payment
+        </a>
+        <input type="text" id="buyerName" placeholder="Enter your name">
+        <div id="paymentLoader">
+            <p>Processing Payment...</p>
+            <div></div>
+        </div>
+        <button id="payBtn" onclick="completePayment()">Pay Now</button>
+        <button id="cancelBtn" onclick="closePopup()">Cancel</button>
+    </div>
+</div>
+
+<script>
+// ------------------ USER INFO ------------------
+const productId = window.location.pathname.split('/').pop();
+
+let username = localStorage.getItem('username');
+if (!username) {
+    username = prompt("Enter your username (for points & badges):") || "Guest";
+    localStorage.setItem('username', username);
+}
+document.getElementById('viewing-as').innerText = username;
+
+// ------------------ LOAD PRODUCT ------------------
+fetch('/api/products')
+.then(res => res.ok ? res.json() : Promise.reject('Failed to load products'))
+.then(products => {
+    const product = products.find(p => p._id === productId);
+    if (!product) {
+        document.getElementById('name').innerText = 'Product not found';
+        document.getElementById('description').innerText = '';
+        document.getElementById('image').src = 'https://via.placeholder.com/400';
+        return;
+    }
+    document.getElementById('name').innerText = product.name;
+    document.getElementById('image').src = product.imageUrl || 'https://via.placeholder.com/400';
+    document.getElementById('description').innerText = product.description || 'No description provided.';
+    document.getElementById('price').innerText = `Price: ₹${product.price || 'N/A'}`;
+})
+.catch(err => {
+    console.error(err);
+    document.getElementById('name').innerText = 'Error loading product';
+});
+
+// ------------------ LOAD USER ------------------
+function loadUserInfo() {
+    fetch('/api/users')
+    .then(res => res.ok ? res.json() : Promise.reject('Failed to load users'))
+    .then(users => {
+        const user = users.find(u => u.username === username);
+        if (user) {
+            document.getElementById('points').innerText = user.points;
+            document.getElementById('badges').innerText = (user.badges && user.badges.length) ? user.badges.join(', ') : 'None';
+        }
+    })
+    .catch(err => console.error(err));
+}
+loadUserInfo();
+
+// ------------------ PAYMENT POPUP ------------------
+function openPaymentPopup() {
+    document.getElementById("paymentPopup").style.display = "flex";
+}
+
+function closePopup() {
+    document.getElementById("paymentPopup").style.display = "none";
+    document.getElementById("paymentLoader").style.display = "none";
+    document.getElementById("payBtn").style.display = "inline-block";
+    document.getElementById("cancelBtn").style.display = "inline-block";
+}
+
+function completePayment() {
+    const buyerName = document.getElementById("buyerName").value.trim();
+    if (!buyerName) {
+        alert("Enter your name before paying!");
+        return;
+    }
+
+    document.getElementById("paymentLoader").style.display = "block";
+    document.getElementById("payBtn").style.display = "none";
+    document.getElementById("cancelBtn").style.display = "none";
+
+    setTimeout(() => {
+        document.querySelector('#paymentPopup .popup-content').innerHTML = `<h2>Payment Successful! 🎉</h2><p>Paid via UPI / Card by ${buyerName}.</p>`;
+        setTimeout(() => window.location.href = "/", 1500);
+    }, 2500);
+}
+</script>
+</body>
+</html>

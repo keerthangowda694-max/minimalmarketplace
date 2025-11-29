@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Minimal Marketplace</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+/* ---------------- BODY & BACKGROUND ---------------- */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    background: linear-gradient(120deg,#ff9a9e,#fad0c4,#a18cd1,#fbc2eb);
+    background-size: 400% 400%;
+    animation: gradientShift 20s ease infinite;
+    overflow-x: hidden;
+    position: relative;
+}
+
+@keyframes gradientShift {
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* ---------------- HEADER ---------------- */
+h1 {
+    text-align: center;
+    color: #fff;
+    font-size: 3rem;
+    margin-top: 20px;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: fadeIn 1s ease forwards;
+}
+
+/* ---------------- BUTTON ---------------- */
+.btn {
+    display: inline-block;
+    padding: 15px 35px;
+    margin: 20px auto;
+    background: linear-gradient(45deg,#ff6b6b,#ff4757);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: bold;
+    display: block;
+    width: 200px;
+    text-align: center;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+    transition: all 0.4s ease;
+}
+.btn:hover {
+    transform: scale(1.15) rotate(-2deg);
+    box-shadow: 0 8px 35px rgba(0,0,0,0.5);
+}
+
+/* ---------------- PRODUCTS ---------------- */
+.products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center;
+    padding-bottom: 50px;
+}
+
+.product-card {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    width: 240px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 35px rgba(0,0,0,0.2);
+    transition: transform 0.5s, box-shadow 0.5s;
+    opacity: 0;
+    animation: fadeInCard 0.6s forwards;
+    perspective: 1000px;
+}
+.product-card:hover {
+    transform: rotateY(10deg) rotateX(5deg) translateY(-10px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+}
+
+.product-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 15px;
+    transition: transform 0.4s, box-shadow 0.4s;
+}
+.product-card img:hover {
+    transform: scale(1.1) rotate(1deg);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.product-card h3 {
+    margin: 12px 0 5px;
+    color: #333;
+    font-size: 1.2rem;
+}
+.product-card p {
+    margin: 0 0 10px;
+    font-weight: bold;
+    color: #555;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+.view-btn, .delete-btn {
+    padding: 8px 15px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.view-btn {
+    background: #2ed573;
+    color: white;
+    box-shadow: 0 4px 15px #2ed57360;
+}
+.view-btn:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 25px #2ed57380;
+}
+.delete-btn {
+    background: #ff4757;
+    color: white;
+    box-shadow: 0 4px 15px #ff475760;
+}
+.delete-btn:hover {
+    transform: scale(1.15);
+    box-shadow: 0 6px 25px #ff475780;
+}
+
+/* ---------------- ANIMATIONS ---------------- */
+@keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+@keyframes fadeInCard {
+    0% {opacity:0; transform: translateY(30px) rotateX(5deg);}
+    100% {opacity:1; transform: translateY(0) rotateX(0);}
+}
+
+/* ---------------- FLOATING PARTICLES ---------------- */
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: floatParticle linear infinite;
+    pointer-events: none;
+}
+@keyframes floatParticle {
+    0% {transform: translateY(0) rotate(0deg);}
+    50% {transform: translateY(-80px) rotate(180deg);}
+    100% {transform: translateY(0) rotate(360deg);}
+}
+
+/* ---------------- BUBBLES ---------------- */
+.bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    pointer-events: none;
+    animation: floatBubble linear infinite;
+}
+@keyframes floatBubble {
+    0% {transform: translateY(0) scale(1);}
+    50% {transform: translateY(-100px) scale(1.2);}
+    100% {transform: translateY(0) scale(1);}
+}
+
+/* ---------------- USER INFO ---------------- */
+#user-info {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.6);
+    padding: 15px;
+    border-radius: 15px;
+    color: #fff;
+}
+</style>
+</head>
+<body>
+<h1>Minimal Marketplace</h1>
+<a href="/add" class="btn">Add Product</a>
+<div class="products" id="products"></div>
+
+<!-- Floating particles -->
+<div class="particle" style="width:60px;height:60px;background:rgba(255,255,255,0.2);top:100px;left:60px;animation-duration:12s;"></div>
+<div class="particle" style="width:40px;height:40px;background:rgba(255,255,255,0.15);top:300px;left:200px;animation-duration:18s;"></div>
+<div class="particle" style="width:100px;height:100px;background:rgba(255,255,255,0.1);top:500px;left:100px;animation-duration:22s;"></div>
+
+<!-- User info -->
+<div id="user-info">
+    <h2>Welcome, <span id="username">Guest</span></h2>
+    <p>Points: <span id="points">0</span></p>
+    <p>Badges: <span id="badges">None</span></p>
+</div>
+
+<a href="/leaderboard" class="btn">View Leaderboard</a>
+
+<script>
+const username = prompt("Enter your username") || "Guest";
+document.getElementById('username').innerText = username;
+
+// Fetch user points & badges
+fetch(`/api/users`)
+    .then(res => res.json())
+    .then(users => {
+        const user = users.find(u => u.username === username);
+        if (user) {
+            document.getElementById('points').innerText = user.points;
+            document.getElementById('badges').innerText = user.badges.join(', ') || 'None';
+        }
+    });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('products');
+
+    function loadProducts(){
+        container.innerHTML='';
+        fetch('/api/products')
+        .then(res=>res.json())
+        .then(products=>{
+            if(!products || products.length===0){container.innerHTML='<p>No products available.</p>'; return;}
+            products.forEach(p=>{
+                const card=document.createElement('div');
+                card.className='product-card';
+                card.innerHTML=`
+                    <img src="${p.imageUrl}" alt="${p.name}">
+                    <h3>${p.name}</h3>
+                    <p>₹${p.price}</p>
+                    <div class="buttons">
+                        <a href="/product/${p._id}" class="view-btn">View</a>
+                        <button class="delete-btn" onclick="deleteProduct('${p._id}', this)">Delete</button>
+                    </div>`;
+                container.appendChild(card);
+            });
+        });
+    }
+
+    window.deleteProduct = function(id, btn){
+        if(!confirm('Are you sure?')) return;
+        fetch(`/api/products/${id}`,{method:'DELETE'})
+        .then(res=>res.json())
+        .then(data=>{
+            if(data.success){
+                btn.closest('.product-card').remove();
+            }else alert(data.message || 'Delete failed!');
+        })
+        .catch(err=>{console.error(err); alert('Server error');});
+    }
+    
+
+    
+
+    loadProducts();
+});
+
+// Generate animated bubbles
+const bubbleCount = 20;
+for(let i=0;i<bubbleCount;i++){
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const size = Math.random()*60 + 20; 
+    bubble.style.width = `${size}px`;
+    bubble.style.height = `${size}px`;
+    bubble.style.top = `${Math.random()*window.innerHeight}px`;
+    bubble.style.left = `${Math.random()*window.innerWidth}px`;
+    bubble.style.animationDuration = `${Math.random()*20 + 10}s`; 
+    bubble.style.background = `rgba(255,255,255,${Math.random()*0.15 + 0.05})`;
+    document.body.appendChild(bubble);
+}
+</script>
+</body>
+</html>
