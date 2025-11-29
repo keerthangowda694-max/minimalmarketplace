@@ -1,73 +1,57 @@
-import express from "express";
-import Product from "../models/Product.js";
-import path from "path";
+const express = require("express");
+const path = require("path");
+const multer = require("multer");
+const Product = require("../models/Product");
 
 const router = express.Router();
 
-/* -------------------- HTML PAGES -------------------- */
-
-// Home
-router.get("/", (req, res) => {
-    res.sendFile(path.resolve("public/html/index.html"));
+// Image upload system
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, "../public/uploads"));
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + "-" + file.originalname);
+    }
 });
+const upload = multer({ storage });
 
-// Add Product Page
+// Serve Add Product page
 router.get("/add", (req, res) => {
-    res.sendFile(path.resolve("public/html/addProduct.html"));
+    res.sendFile(path.join(__dirname, "../public/html/addProduct.html"));
 });
 
-// Leaderboard Page
-router.get("/leaderboard", (req, res) => {
-    res.sendFile(path.resolve("public/html/leaderboard.html"));
-});
-
-// Product Detail Page
-router.get("/product/:id", (req, res) => {
-    res.sendFile(path.resolve("public/html/ProductDetail.html")); 
-});
-
-/* -------------------- API ROUTES -------------------- */
-
-// Add new product
-router.post("/api/addProduct", async (req, res) => {
+// Create product
+router.post("/api/products", upload.single("image"), async (req, res) => {
     try {
-        const { title, price, image, description } = req.body;
+        const product = new Product({
+            title: req.body.title,
+            price: req.body.price,
+            description: req.body.description,
+            image: "/uploads/" + req.file.filename
+        });
 
-        if (!title || !price || !image || !description) {
-            return res.status(400).json({ error: "All fields are required." });
-        }
-
-        const newProduct = new Product({ title, price, image, description });
-        await newProduct.save();
-
-        res.json({ message: "Product added successfully", product: newProduct });
-    } catch (error) {
-        console.error("Add product error:", error);
-        res.status(500).json({ error: "Server error" });
+        await product.save();
+        res.json({ success: true });
+    } catch (err) {
+        res.json({ error: err.message });
     }
 });
 
 // Get all products
 router.get("/api/products", async (req, res) => {
-    try {
-        const products = await Product.find();
-        res.json(products);
-    } catch (error) {
-        res.status(500).json({ error: "Server error" });
-    }
+    const products = await Product.find();
+    res.json(products);
 });
 
-// Get product by ID
-router.get("/api/product/:id", async (req, res) => {
-    try {
-        const product = await Product.findById(req.params.id);
-        if (!product)
-            return res.status(404).json({ error: "Product not found" });
-
-        res.json(product);
-    } catch (error) {
-        res.status(500).json({ error: "Server error" });
-    }
+// Show product detail page
+router.get("/product/:id", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/html/ProductDetail.html"));
 });
 
-export default router;
+// Home page
+router.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/html/index.html"));
+});
+
+module.exports = router;
